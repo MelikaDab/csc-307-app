@@ -1,12 +1,11 @@
 //import React from 'react'
 
-function TableHeader() {
+function TableHeader(props) {
     return (
       <thead>
         <tr>
           <th>Name</th>
           <th>Job</th>
-          <th>Remove</th>
         </tr>
       </thead>
     );
