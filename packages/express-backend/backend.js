@@ -54,6 +54,10 @@ const deleteUser = (user) => {
   return users["users_list"];
 }
 
+const findUserByJobAndName = (job, name) => {
+  return users["users_list"].filter(item => item.job === job && item.name === name);
+}
+
 // routes
 app.get("/", (req, res) => {
   res.send("hello world!");
@@ -95,6 +99,19 @@ app.delete("/users/:id", (req, res) => {
     res.send(deleteUser(result));
   }
 })
+
+
+// app.get("/users/namejob", (req, res) => {
+//   const {name, job } = req.body;
+//   res.send("hello")
+//   let result = findUserByJobAndName(job, name);
+//   if (result === undefined) {
+//     res.status(404).send("Resource not found.");
+//   } else {
+//     res.send(result);
+//   }
+
+// })
 
 
 
