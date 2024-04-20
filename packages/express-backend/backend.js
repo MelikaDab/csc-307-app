@@ -106,7 +106,7 @@ app.post("/users", (req, res) => {
   if (result === undefined) {
     res.status(400).send("Bad request.");
   } else {
-    res.status(201).send();
+    res.status(201).send(result);
   }
 });
 

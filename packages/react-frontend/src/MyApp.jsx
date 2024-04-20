@@ -24,9 +24,10 @@ function MyApp() {
 
   function updateList(person) {
     postUser(person)
-      .then((res) => {
+      .then(async (res) => {
         if (res.status === 201) {
-          setCharacters([...characters, person]);
+          const newCharacter = await res.json(); 
+          setCharacters([...characters, newCharacter]);
         } else {
           console.log("Create unsuccessful");
         }
