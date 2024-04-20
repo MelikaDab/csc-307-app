@@ -1,8 +1,10 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
 
+app.use(cors());
 // set up our express app to process incoming data in json format
 app.use(express.json());
 
@@ -37,26 +39,53 @@ let users = {
 };
 
 // helper functions
-const findUserById = (id) =>
-  users["users_list"].find((user) => user["id"] === id);
+const findUserById = (id) => {
 
+  return users["users_list"].find((user) => user["id"] === id);
+
+};
 const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
+const generateID = () => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  for (let i = 0; i < 8; i++) {
+    id += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return id;
+}
+
 const addUser = (user) => {
+  //let id =  Math.floor(10000 + Math.random() * 90000);
+  let id;
+  let isUniqueId = false;
+
+  while (!isUniqueId) {
+    id = generateID();
+    // Check if the generated ID already exists in the users_list
+    if (!users["users_list"].some((user) => user.id === id)) {
+      isUniqueId = true;
+    }
+  }
+
+  user.id = id;
   users["users_list"].push(user);
+  console.log(users);
   return user;
 };
 
 const deleteUser = (user) => {
-  users["users_list"] = users["users_list"].filter(item => item !== user)
+  users["users_list"] = users["users_list"].filter((item) => item !== user);
   return users["users_list"];
-}
+};
 
 const findUserByJobAndName = (job, name) => {
-  return users["users_list"].filter(item => item.job === job && item.name === name);
-}
+  return users["users_list"].filter(
+    (item) => item.job === job && item.name === name
+  );
+};
 
 // routes
 app.get("/", (req, res) => {
@@ -86,8 +115,12 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send(userToAdd);
+  let result = addUser(userToAdd);
+  if (result === undefined) {
+    res.status(400).send("Bad request.");
+  } else {
+    res.status(201).send(result);
+  }
 });
 
 app.delete("/users/:id", (req, res) => {
@@ -96,10 +129,9 @@ app.delete("/users/:id", (req, res) => {
   if (result === undefined) {
     res.status(404).send("Resource not found.");
   } else {
-    res.send(deleteUser(result));
+    res.status(204).send(deleteUser(result));
   }
-})
-
+});
 
 // app.get("/users/namejob", (req, res) => {
 //   const {name, job } = req.body;
@@ -112,8 +144,6 @@ app.delete("/users/:id", (req, res) => {
 //   }
 
 // })
-
-
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
