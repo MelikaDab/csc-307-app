@@ -1,8 +1,11 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
 
+
+app.use(cors());
 // set up our express app to process incoming data in json format
 app.use(express.json());
 
