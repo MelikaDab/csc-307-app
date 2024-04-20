@@ -2,37 +2,45 @@ import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import Form from "./Form";
 
-
 function MyApp() {
-    const [characters, setCharacters] = useState([]);
-    useEffect(() => {
-      fetchUsers()
-        .then((res) => res.json())
-        .then((json) => setCharacters(json["users_list"]))
-        .catch((error) => { console.log(error); });
-    }, [] );
+  const [characters, setCharacters] = useState([]);
+  useEffect(() => {
+    fetchUsers()
+      .then((res) => res.json())
+      .then((json) => { 
+        setCharacters(json["users_list"]); 
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
-    function removeOneCharacter(index) {
-        const updated = characters.filter((character, i) => {
-          return i !== index;
-        });
-        setCharacters(updated);
-    }
-
-    function updateList(person) { 
-      postUser(person)
-        .then(() => setCharacters([...characters, person]))
-        .catch((error) => {
-          console.log(error);
-        })
+  function removeOneCharacter(index) {
+    const updated = characters.filter((character, i) => {
+      return i !== index;
+    });
+    setCharacters(updated);
   }
 
-    function fetchUsers() {
-      const promise = fetch("http://localhost:8000/users");
-      return promise;
-    }
+  function updateList(person) {
+    postUser(person)
+      .then((res) => {
+        if (res.status === 201) {
+          setCharacters([...characters, person]);
+        } else {
+          console.log("Create unsuccessful");
+        }
+        })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
-    
+  function fetchUsers() {
+    const promise = fetch("http://localhost:8000/users");
+    return promise;
+  }
+
   function postUser(person) {
     const promise = fetch("http://localhost:8000/users", {
       method: "POST",
@@ -44,18 +52,14 @@ function MyApp() {
 
     return promise;
   }
-    
-    return (
-        <div className="container">
-          <Table
-            characterData={characters}
-            removeCharacter={removeOneCharacter}
-          />
-          <Form handleSubmit={updateList} />
-        </div>
-      );
-}
 
+  return (
+    <div className="container">
+      <Table characterData={characters} removeCharacter={removeOneCharacter} />
+      <Form handleSubmit={updateList} />
+    </div>
+  );
+}
 
 // make component available for import by other files
 export default MyApp;
