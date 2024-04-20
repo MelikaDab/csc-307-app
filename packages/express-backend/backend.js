@@ -48,17 +48,17 @@ const findUserByName = (name) => {
 };
 
 const addUser = (user) => {
-  let id =  Math.floor(10000 + Math.random() * 90000);
-  // let id;
-  // isUniqueId = false;
+  //let id =  Math.floor(10000 + Math.random() * 90000);
+  let id;
+  let isUniqueId = false;
 
-  // while (!isUniqueId) {
-  //   id =  Math.floor(10000 + Math.random() * 90000);
-  //   // Check if the generated ID already exists in the users_list
-  //   if (!users_list.some(user => user.id === randomId)) {
-  //     isUniqueId = true;
-  //   }
-  // }
+  while (!isUniqueId) {
+    id =  Math.floor(10000 + Math.random() * 90000);
+    // Check if the generated ID already exists in the users_list
+    if (!(users["users_list"]).some(user => user.id === id)) {
+      isUniqueId = true;
+    }
+  }
 
   user.id = id;
   users["users_list"].push(user);
