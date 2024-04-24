@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+//import {  addUser, getUsers, findUserById, findUserByName, findUserByJob } from "./models/user-services"
 
 const app = express();
 const port = 8000;
@@ -40,22 +41,21 @@ let users = {
 
 // helper functions
 const findUserById = (id) => {
-
   return users["users_list"].find((user) => user["id"] === id);
-
 };
 const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
 const generateID = () => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let id = '';
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let id = "";
   for (let i = 0; i < 8; i++) {
     id += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return id;
-}
+};
 
 const addUser = (user) => {
   //let id =  Math.floor(10000 + Math.random() * 90000);
@@ -81,28 +81,46 @@ const deleteUser = (user) => {
   return users["users_list"];
 };
 
-const findUserByJobAndName = (job, name) => {
+const findUserByNameAndJob = (name, job) => {
   return users["users_list"].filter(
-    (item) => item.job === job && item.name === name
+    (item) => item["job"] === job && item["name"] === name
   );
 };
 
 // routes
+
+// root
 app.get("/", (req, res) => {
   res.send("hello world!");
 });
 
+// get user by name and job or either
 app.get("/users", (req, res) => {
   const name = req.query.name;
-  if (name != undefined) {
-    let result = findUserByName(name);
-    result = { users_list: result };
-    res.send(result);
-  } else {
-    res.send(users);
+  const job = req.query.job;
+
+  if (!name && !job) {
+    return res.send(users["users_list"]);
   }
+  let results = [];
+
+  if (name && job) {
+    results = findUserByNameAndJob(name, job);
+  } else if (name) {
+    results = findUserByName(name);
+  } else if (job) {
+    results = findUserByJob(job);
+  }
+
+  if (results.length === 0) {
+    return res.status(404).send("No users found with the specified criteria.");
+  }
+
+  results = { users_list: results };
+  res.send(results);
 });
 
+// get user by id
 app.get("/users/:id", (req, res) => {
   const id = req.params["id"]; //or req.params.id
   let result = findUserById(id);
@@ -113,6 +131,7 @@ app.get("/users/:id", (req, res) => {
   }
 });
 
+// add a user
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
   let result = addUser(userToAdd);
@@ -123,6 +142,7 @@ app.post("/users", (req, res) => {
   }
 });
 
+// delete a user by id
 app.delete("/users/:id", (req, res) => {
   const id = req.params["id"];
   let result = findUserById(id);
@@ -132,18 +152,6 @@ app.delete("/users/:id", (req, res) => {
     res.status(204).send(deleteUser(result));
   }
 });
-
-// app.get("/users/namejob", (req, res) => {
-//   const {name, job } = req.body;
-//   res.send("hello")
-//   let result = findUserByJobAndName(job, name);
-//   if (result === undefined) {
-//     res.status(404).send("Resource not found.");
-//   } else {
-//     res.send(result);
-//   }
-
-// })
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
