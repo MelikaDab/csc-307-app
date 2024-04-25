@@ -1,14 +1,16 @@
 import mongoose from "mongoose";
-import userModel from "./user";
+import userModel from "./user.js";
 
 mongoose.set("debug", true);
 
+const url = process.env.MONGO_URI;
+
 mongoose
-  .connect("mongodb://localhost:27017/users", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  .connect("mongodb+srv://jalehdabiri:CarSeatHeadrest1380@cluster0.swmzsaa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
+    dbName:"users"
   })
   .catch((error) => console.log(error));
+
 
 function getUsers(name, job) {
   let promise;
@@ -18,6 +20,8 @@ function getUsers(name, job) {
     promise = findUserByName(name);
   } else if (job && !name) {
     promise = findUserByJob(job);
+  } else if (job && name) {
+    promise = findUserByNameAndJob(name, job)
   }
   return promise;
 }
@@ -32,6 +36,10 @@ function addUser(user) {
   return promise;
 }
 
+function deleteUser(id) {
+  return userModel.findByIdAndDelete(id)
+}
+
 function findUserByName(name) {
   return userModel.find({ name: name });
 }
@@ -40,10 +48,13 @@ function findUserByJob(job) {
   return userModel.find({ job: job });
 }
 
-export default {
+function findUserByNameAndJob(name, job) {
+  return userModel.find({ job: job, name: name})
+}
+
+export {
   addUser,
   getUsers,
-  findUserById,
-  findUserByName,
-  findUserByJob,
+  deleteUser,
+  findUserById
 };
