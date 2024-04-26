@@ -8,7 +8,7 @@ function MyApp() {
     fetchUsers()
       .then((res) => res.json())
       .then((json) => {
-        setCharacters(json["users_list"]);
+        setCharacters(json);
       })
       .catch((error) => {
         console.log(error);
