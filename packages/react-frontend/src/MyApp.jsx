@@ -24,7 +24,7 @@ function MyApp() {
       .then((res) => {
         if (res.status === 204) {
           const updated = characters.filter(
-            (character) => character.id !== userId
+            (character) => character._id !== userId
           );
           setCharacters(updated);
         } else {
